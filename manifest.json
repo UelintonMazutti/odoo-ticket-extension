@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Acesso rápido a tickets Odoo",
-  "version": "1.1",
+  "version": "1.2",
   "description": "Atalhos para facilitar a vida com o Odoo",
   "permissions": [
     "scripting",
@@ -35,6 +35,6 @@
     }
   ],
   "action": {
-    "default_title": "Atalhos:\nCtrl + Espaço → Busca pelo número do ticket (assunto)\nCtrl + Alt + Espaço → Igual ao anterior (compatível com Opera)\nCtrl + Shift + Espaço → Vai direto para o ticket do link\nCtrl + Shift + C → Copia informações do ticket\nCtrl + Shift + M → Abre os Meus Tickets\nCtrl + Shift + X → Cria um novo ticket\nCtrl + F → Pesquisa tickets por descrição\nCtrl + Shift + F → Busca Avançada (Título, Descrição, Docs...)"
+    "default_title": "Atalhos:\nCtrl + Espaço → Busca pelo número do ticket (assunto)\nCtrl + Alt + Espaço → Igual ao anterior (compatível com Opera)\nCtrl + Shift + Espaço → Vai direto para o ticket do link\nCtrl + Shift + C → Copia informações do ticket\nCtrl + Shift + M → Abre os Meus Tickets\nCtrl + Shift + X → Cria um novo ticket\nCtrl + F → Pesquisa tickets por descrição\nCtrl + Shift + F → Busca Avançada (Título, Descrição, Docs...)\nCtrl + Shift + K → Busca por Cliente (Nome, Sigla, Solicitante)"
   }
 }
