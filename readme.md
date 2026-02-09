@@ -39,6 +39,9 @@ Prioridade: Urgente
 - **Ctrl + F**:  
   Pesquisa os tickets por descrição, para honra e glória de quem sofre com isso
 
+- **Ctrl + Shift + F**:  
+  Busca avançada: Pesquisa no título, descrição, rotina e documentação interna/externa (usando API do Odoo).
+
 ## Funciona para os links abaixo
 
 - [https://suporte.sag.com.br/odoo](https://suporte.sag.com.br/odoo)
