@@ -783,7 +783,7 @@ document.addEventListener("keydown", function (e) {
           model: model,
           method: method,
           args: [domain, fields],
-          kwargs: { limit: 20, context: { lang: "pt_BR" } },
+          kwargs: { limit: 100, context: { lang: "pt_BR" } },
         },
         id: new Date().getTime(),
       };
