@@ -46,6 +46,13 @@ Prioridade: Urgente
   Abre a criação de um novo ticket.
 
 
+- **Ctrl + Shift + F**:  
+  Busca avançada: Pesquisa no título, descrição, rotina e documentação interna/externa (usando API do Odoo).
+
+- **Ctrl + Shift + K**:  
+  Busca por Cliente: Pesquisa por Nome do Cliente, Solicitante ou Sigla.  
+  > *Nota: Exclui automaticamente tickets nos estágios: Notificado, Encerrado, Cancelado/Recusado, Disponível Para Suporte.*
+
 ## Funciona para os links abaixo
 
 - [https://suporte.sag.com.br/odoo](https://suporte.sag.com.br/odoo)

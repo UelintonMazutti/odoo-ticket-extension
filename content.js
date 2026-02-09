@@ -515,3 +515,400 @@ window.addEventListener("load", function () {
 
   trySearch();
 });
+
+// Listener dedicado para Busca Avançada com CAPTURE: TRUE para garantir que o Odoo não bloqueie
+document.addEventListener("keydown", function (e) {
+  // Ctrl + Shift + F → Busca Avançada
+  if (e.ctrlKey && e.shiftKey && e.code === "KeyF") {
+    console.log("[OdooExt] Ctrl+Shift+F detected (Capture Mode)!");
+
+    // Importante: Parar propagação para que o Odoo não tente fazer nada com isso
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (document.getElementById("odoo-ticket-advanced-search-input")) return;
+
+    // --- Criação do Input de Busca Avançada ---
+    const input = document.createElement("input");
+    input.id = "odoo-ticket-advanced-search-input";
+    input.type = "text";
+    input.placeholder = "Busca Avançada (Título, Descrição, Rotina, Docs, Resumo)...";
+    input.autofocus = true;
+
+    Object.assign(input.style, {
+      position: "fixed",
+      top: "50px",
+      left: "50%",
+      transform: "translateX(-50%)",
+      zIndex: "2147483647",
+      width: "600px",
+      padding: "15px",
+      fontSize: "18px",
+      boxShadow: "0 0 20px rgba(0,0,0,0.5)",
+      border: "2px solid #714B67",
+      borderRadius: "8px",
+      outline: "none",
+      backgroundColor: "white",
+      color: "#333"
+    });
+
+    // --- Função para fazer a chamada RPC ao Odoo ---
+    // (Mesma lógica de antes)
+    const searchOdoo = async (term) => {
+      const baseURL = location.origin;
+      const model = "helpdesk.ticket";
+      const method = "search_read";
+
+      const domain = [
+        "|", "|", "|", "|", "|", "|",
+        ["name", "ilike", term],
+        ["description", "ilike", term],
+        ["x_studio_ltima_rotina", "ilike", term],
+        ["x_studio_documentao_interna", "ilike", term],
+        ["x_studio_documentao_externa", "ilike", term],
+        ["x_studio_suporte", "ilike", term],
+        ["x_studio_resumo", "ilike", term]
+      ];
+
+      const fields = ["id", "name", "stage_id", "partner_id", "user_id"];
+
+      const payload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          model: model,
+          method: method,
+          args: [domain, fields],
+          kwargs: { limit: 20, context: { lang: "pt_BR" } },
+        },
+        id: new Date().getTime(),
+      };
+
+      try {
+        const response = await fetch(`${baseURL}/web/dataset/call_kw/${model}/${method}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+        if (result.error) {
+          console.error("Erro Odoo RPC:", result.error);
+          alert("Erro na busca: " + result.error.data.message);
+          return [];
+        }
+        return result.result;
+      } catch (err) {
+        console.error("Erro na requisição:", err);
+        alert("Erro de conexão ao buscar tickets.");
+        return [];
+      }
+    };
+
+    // --- Função para exibir os resultados ---
+    const showResults = (tickets) => {
+      const oldModal = document.getElementById("odoo-search-results-modal");
+      if (oldModal) oldModal.remove();
+
+      if (!tickets || tickets.length === 0) {
+        const toast = document.createElement("div");
+        toast.innerText = "Nenhum ticket encontrado.";
+        Object.assign(toast.style, {
+          position: "fixed", bottom: "20px", right: "20px",
+          backgroundColor: "#dc3545", color: "white", padding: "10px 20px",
+          borderRadius: "5px", zIndex: "2147483647", boxShadow: "0 2px 5px rgba(0,0,0,0.2)"
+        });
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+        return;
+      }
+
+      const modal = document.createElement("div");
+      modal.id = "odoo-search-results-modal";
+      Object.assign(modal.style, {
+        position: "fixed", top: "80px", left: "50%", transform: "translateX(-50%)",
+        width: "600px", maxHeight: "80vh", backgroundColor: "white",
+        borderRadius: "8px", boxShadow: "0 10px 25px rgba(0,0,0,0.3)", zIndex: "2147483647",
+        display: "flex", flexDirection: "column", overflow: "hidden", border: "1px solid #ddd",
+        fontFamily: "system-ui, -apple-system, sans-serif"
+      });
+
+      const header = document.createElement("div");
+      header.innerText = `Resultados: ${tickets.length} ticket(s)`;
+      Object.assign(header.style, {
+        padding: "15px", backgroundColor: "#714B67", color: "white",
+        fontWeight: "bold", fontSize: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"
+      });
+
+      const closeBtn = document.createElement("span");
+      closeBtn.innerText = "×";
+      closeBtn.style.cursor = "pointer";
+      closeBtn.style.fontSize = "24px";
+      closeBtn.onclick = () => modal.remove();
+      header.appendChild(closeBtn);
+      modal.appendChild(header);
+
+      const list = document.createElement("div");
+      Object.assign(list.style, { overflowY: "auto", padding: "10px", flex: "1" });
+
+      tickets.forEach(t => {
+        const item = document.createElement("div");
+        Object.assign(item.style, {
+          padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer", transition: "background 0.2s"
+        });
+        item.onmouseover = () => item.style.backgroundColor = "#f9f9f9";
+        item.onmouseout = () => item.style.backgroundColor = "transparent";
+
+        const cliente = Array.isArray(t.partner_id) ? t.partner_id[1] : "-";
+        const estagio = Array.isArray(t.stage_id) ? t.stage_id[1] : "-";
+        const responsavel = Array.isArray(t.user_id) ? t.user_id[1] : "-";
+
+        item.innerHTML = `
+          <div style="font-weight: bold; color: #333;">#${t.id} - ${t.name}</div>
+          <div style="font-size: 13px; color: #666; margin-top: 4px;">
+            <span style="display:inline-block; margin-right: 15px;">👤 ${cliente}</span>
+            <span style="display:inline-block;">🏷️ ${estagio}</span>
+            <span style="display:inline-block;">💼 ${responsavel}</span>
+          </div>
+        `;
+        item.onclick = () => {
+          modal.remove();
+          window.open(`${location.origin}/odoo/all-tickets/${t.id}`, "_blank");
+        };
+        list.appendChild(item);
+      });
+
+      modal.appendChild(list);
+      document.body.appendChild(modal);
+
+      const escListener = (ev) => {
+        if (ev.key === "Escape") {
+          modal.remove();
+          document.removeEventListener("keydown", escListener);
+        }
+      };
+      document.addEventListener("keydown", escListener);
+    };
+
+    input.addEventListener("keydown", async function (ev) {
+      if (ev.key === "Enter") {
+        const term = input.value.trim();
+        if (term.length < 3) {
+          alert("Digite pelo menos 3 caracteres.");
+          return;
+        }
+        input.disabled = true;
+        input.placeholder = "Buscando...";
+        try {
+          const results = await searchOdoo(term);
+          input.remove();
+          showResults(results);
+        } catch (e) {
+          input.disabled = false;
+          input.placeholder = "Tente novamente...";
+          console.error(e);
+        }
+      } else if (ev.key === "Escape") {
+        input.remove();
+      }
+    });
+
+    document.body.appendChild(input);
+    input.focus();
+  }
+}, true); // UseCapture = true para interceptar antes do Odoo
+
+// Listener dedicado para Busca de Clientes (Ctrl + Shift + K)
+document.addEventListener("keydown", function (e) {
+  // Ctrl + Shift + K → Busca por Cliente
+  if (e.ctrlKey && e.shiftKey && e.code === "KeyK") {
+    console.log("[OdooExt] Ctrl+Shift+K detected (Capture Mode)!");
+
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (document.getElementById("odoo-ticket-client-search-input")) return;
+
+    // --- Criação do Input de Busca Cliente ---
+    const input = document.createElement("input");
+    input.id = "odoo-ticket-client-search-input";
+    input.type = "text";
+    input.placeholder = "Busca Cliente (Nome, Solicitante, Sigla)...";
+    input.autofocus = true;
+
+    Object.assign(input.style, {
+      position: "fixed",
+      top: "50px",
+      left: "50%",
+      transform: "translateX(-50%)",
+      zIndex: "2147483647",
+      width: "600px",
+      padding: "15px",
+      fontSize: "18px",
+      boxShadow: "0 0 20px rgba(0,0,0,0.5)",
+      border: "2px solid #28a745", // Verde para diferenciar
+      borderRadius: "8px",
+      outline: "none",
+      backgroundColor: "white",
+      color: "#333"
+    });
+
+    // --- Função para fazer a chamada RPC ao Odoo ---
+    const searchOdooClient = async (term) => {
+      const baseURL = location.origin;
+      const model = "helpdesk.ticket";
+      const method = "search_read";
+
+      // Busca em: partner_id, x_studio_solicitantes, x_studio_sigla_cliente
+      // E exclui estágios específicos
+      const domain = [
+        "|", "|",
+        ["partner_id", "ilike", term],
+        ["x_studio_solicitantes", "ilike", term],
+        ["x_studio_sigla_cliente", "ilike", term],
+
+        // Exclusões de estágios
+        ["stage_id", "!=", "Notificado"],
+        ["stage_id", "!=", "Encerrado"],
+        ["stage_id", "!=", "Cancelado/Recusado"],
+        ["stage_id", "!=", "Disponível Para Suporte"]
+      ];
+
+      const fields = ["id", "name", "stage_id", "partner_id", "user_id", "x_studio_solicitantes"];
+
+      const payload = {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          model: model,
+          method: method,
+          args: [domain, fields],
+          kwargs: { limit: 20, context: { lang: "pt_BR" } },
+        },
+        id: new Date().getTime(),
+      };
+
+      try {
+        const response = await fetch(`${baseURL}/web/dataset/call_kw/${model}/${method}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+        if (result.error) {
+          console.error("Erro Odoo RPC:", result.error);
+          alert("Erro na busca: " + result.error.data.message);
+          return [];
+        }
+        return result.result;
+      } catch (err) {
+        console.error("Erro na requisição:", err);
+        alert("Erro de conexão ao buscar tickets.");
+        return [];
+      }
+    };
+
+    // --- Função para exibir os resultados ---
+    const showResults = (tickets) => {
+      const oldModal = document.getElementById("odoo-client-search-results-modal");
+      if (oldModal) oldModal.remove();
+
+      if (!tickets || tickets.length === 0) {
+        const toast = document.createElement("div");
+        toast.innerText = "Nenhum ticket encontrado para esse cliente.";
+        Object.assign(toast.style, {
+          position: "fixed", bottom: "20px", right: "20px",
+          backgroundColor: "#dc3545", color: "white", padding: "10px 20px",
+          borderRadius: "5px", zIndex: "2147483647", boxShadow: "0 2px 5px rgba(0,0,0,0.2)"
+        });
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+        return;
+      }
+
+      const modal = document.createElement("div");
+      modal.id = "odoo-client-search-results-modal";
+      Object.assign(modal.style, {
+        position: "fixed", top: "80px", left: "50%", transform: "translateX(-50%)",
+        width: "600px", maxHeight: "80vh", backgroundColor: "white",
+        borderRadius: "8px", boxShadow: "0 10px 25px rgba(0,0,0,0.3)", zIndex: "2147483647",
+        display: "flex", flexDirection: "column", overflow: "hidden", border: "1px solid #ddd",
+        fontFamily: "system-ui, -apple-system, sans-serif"
+      });
+
+      const header = document.createElement("div");
+      header.innerText = `Clientes Encontrados: ${tickets.length} ticket(s)`;
+      Object.assign(header.style, {
+        padding: "15px", backgroundColor: "#28a745", color: "white",
+        fontWeight: "bold", fontSize: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"
+      });
+
+      const closeBtn = document.createElement("span");
+      closeBtn.innerText = "×";
+      closeBtn.style.cursor = "pointer";
+      closeBtn.onclick = () => modal.remove();
+      header.appendChild(closeBtn);
+      modal.appendChild(header);
+
+      const list = document.createElement("div");
+      Object.assign(list.style, { overflowY: "auto", padding: "10px", flex: "1" });
+
+      tickets.forEach(t => {
+        const item = document.createElement("div");
+        Object.assign(item.style, {
+          padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer", transition: "background 0.2s"
+        });
+        item.onmouseover = () => item.style.backgroundColor = "#f9f9f9";
+        item.onmouseout = () => item.style.backgroundColor = "transparent";
+
+        const cliente = Array.isArray(t.partner_id) ? t.partner_id[1] : "-";
+        const solicitantes = t.x_studio_solicitantes || "-";
+        const estagio = Array.isArray(t.stage_id) ? t.stage_id[1] : "-";
+
+        item.innerHTML = `
+          <div style="font-weight: bold; color: #333;">#${t.id} - ${t.name}</div>
+          <div style="font-size: 13px; color: #666; margin-top: 4px;">
+            <span style="display:block; margin-bottom: 2px;">👤 ${cliente} (${solicitantes})</span>
+            <span style="display:inline-block;">🏷️ ${estagio}</span>
+          </div>
+        `;
+        item.onclick = () => {
+          // modal.remove();
+          window.open(`${location.origin}/odoo/all-tickets/${t.id}`, "_blank");
+        };
+        list.appendChild(item);
+      });
+
+      modal.appendChild(list);
+      document.body.appendChild(modal);
+
+      const escListener = (ev) => {
+        if (ev.key === "Escape") {
+          modal.remove();
+          document.removeEventListener("keydown", escListener);
+        }
+      };
+      document.addEventListener("keydown", escListener);
+    };
+
+    input.addEventListener("keydown", async function (ev) {
+      if (ev.key === "Enter") {
+        const term = input.value.trim();
+        if (term.length < 3) return alert("Digite pelo menos 3 caracteres.");
+        input.disabled = true; input.placeholder = "Buscando cliente...";
+        try {
+          const results = await searchOdooClient(term);
+          input.remove(); showResults(results);
+        } catch (e) {
+          input.disabled = false; input.placeholder = "Tente novamente...";
+        }
+      } else if (ev.key === "Escape") {
+        input.remove();
+      }
+    });
+
+    document.body.appendChild(input);
+    input.focus();
+  }
+}, true);
