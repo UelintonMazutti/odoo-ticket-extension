@@ -1,13 +1,171 @@
-#odoo-ticket-input {
+/* Variáveis de Cores */
+:root {
+  --primary-color: #714B67;
+  --secondary-color: #017e84;
+  --bg-color: #f8f9fa;
+  --text-color: #212529;
+  --shadow-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Modal Overlay */
+#odoo-ticket-modal-overlay {
   position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  padding: 10px;
-  font-size: 16px;
-  width: 250px;
-  border: 2px solid #888;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  /* Slight dim */
+  z-index: 2147483647;
+  /* Máximo z-index */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 50px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Modal Content */
+#odoo-ticket-modal-content {
+  background: white;
+  width: 600px;
+  max-width: 90%;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  border: 2px solid #017e84;
+  /* Green border */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideDown 0.2s ease-out;
+}
+
+/* Modal Header */
+.odoo-ticket-modal-header {
+  background-color: #017e84;
+  /* Green background */
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.odoo-ticket-close-btn {
+  cursor: pointer;
+  font-size: 20px;
+  opacity: 0.8;
+}
+
+.odoo-ticket-close-btn:hover {
+  opacity: 1;
+}
+
+/* Input Area */
+#odoo-ticket-search-input {
+  width: 100%;
+  padding: 15px 20px;
+  font-size: 16px;
+  border: none;
+  border-bottom: 1px solid #eee;
+  outline: none;
+  background: white;
+  color: #333;
+}
+
+#odoo-ticket-search-input::placeholder {
+  color: #999;
+}
+
+/* Results List */
+#odoo-ticket-results-list {
+  max-height: 500px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background-color: #f9f9f9;
+}
+
+.odoo-ticket-result-item {
+  padding: 12px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  transition: background-color 0.1s;
+}
+
+.odoo-ticket-result-item:hover {
+  background-color: #eeffff;
+  /* Light green tint on hover */
+}
+
+/* Result Row 1: Ref + Name */
+.odoo-ticket-result-row-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.odoo-ticket-ref {
+  font-weight: bold;
+  font-size: 14px;
+  color: #333;
+}
+
+.odoo-ticket-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #444;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Result Row 2: Meta (Icons) */
+.odoo-ticket-result-row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  font-size: 12px;
+  color: #666;
+}
+
+.odoo-ticket-result-row-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.odoo-ticket-result-row-meta i {
+  color: #017e84;
+  /* Icon color matching theme */
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
