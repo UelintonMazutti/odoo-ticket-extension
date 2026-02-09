@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Acesso rápido a tickets Odoo",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Atalhos para facilitar a vida com o Odoo",
   "permissions": [
     "scripting",
