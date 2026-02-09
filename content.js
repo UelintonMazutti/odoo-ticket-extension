@@ -54,7 +54,7 @@ document.addEventListener("keydown", function (e) {
     return { input, resultsList };
   }
 
-  // Ctrl + Espaço e Ctrl + Alt + Espaço → Buscar ticket (Modal)
+  // Ctrl + Espaço e Ctrl + Alt + Espaço → Buscar ticket (Modal) por ID
   if (
     e.code === "Space" &&
     (
@@ -64,11 +64,55 @@ document.addEventListener("keydown", function (e) {
   ) {
     e.preventDefault();
 
-    createModal("Digite o número do ticket...", (ticketNumber) => {
-      closeModal();
-      if (ticketNumber) {
-        sessionStorage.setItem("odooTicketToSearch", ticketNumber);
-        window.open(`${baseURL}/odoo/all-tickets`, "_blank");
+    const { input, resultsList } = createModal("Digite o ID do ticket...", async (term, inp, list) => {
+      list.innerHTML = '<li class="odoo-ticket-result-item">Buscando...</li>';
+
+      // Ensure term is a number for ID search
+      const ticketId = parseInt(term);
+      if (isNaN(ticketId)) {
+        list.innerHTML = '<li class="odoo-ticket-result-item">Por favor, digite um número válido.</li>';
+        return;
+      }
+
+      const csrfToken = getCsrfToken();
+      if (!csrfToken) {
+        list.innerHTML = '<li class="odoo-ticket-result-item">Erro: CSRF Token não encontrado.</li>';
+        return;
+      }
+
+      // Domain: search by ID
+      const domain = [["id", "=", ticketId]];
+
+      try {
+        const response = await fetch(`${location.origin}/web/dataset/call_kw/helpdesk.ticket/search_read`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            method: "call",
+            params: {
+              model: "helpdesk.ticket",
+              method: "search_read",
+              args: [],
+              kwargs: {
+                domain: domain,
+                fields: ["id", "name", "ticket_ref", "partner_id", "stage_id", "user_id", "create_date", "x_studio_prioridade"],
+                limit: 1 // ID is unique
+              }
+            },
+            id: Math.floor(Math.random() * 1000000000)
+          })
+        });
+        const result = await response.json();
+        if (result.error) {
+          console.error("RPC Error:", result.error);
+          list.innerHTML = '<li class="odoo-ticket-result-item">Erro na busca.</li>';
+          return;
+        }
+        renderResults(result.result || [], list);
+      } catch (err) {
+        console.error("Fetch error:", err);
+        list.innerHTML = '<li class="odoo-ticket-result-item">Erro na conexão.</li>';
       }
     });
   }
