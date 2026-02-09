@@ -1,0 +1,1 @@
+// Não faz nada por enquanto, mas necessário para manifest v3

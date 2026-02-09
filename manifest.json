@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Acesso rápido a tickets Odoo",
+  "version": "1.0",
+  "description": "Atalhos para facilitar a vida com o Odoo",
+  "permissions": ["scripting", "activeTab"],
+  "host_permissions": [
+    "https://suporte.sag.com.br/*",
+    "https://helpdesk.sag.com.br/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://suporte.sag.com.br/*",
+        "https://helpdesk.sag.com.br/*"
+      ],
+      "js": ["content.js"],
+      "css": ["style.css"]
+    }
+  ],
+  "action": {
+    "default_title": "Atalhos:\nCtrl + Espaço → Busca pelo número do ticket (assunto)\nCtrl + Alt + Espaço → Igual ao anterior (compatível com Opera)\nCtrl + Shift + Espaço → Vai direto para o ticket do link\nCtrl + Shift + C → Copia informações do ticket\nCtrl + Shift + M → Abre os Meus Tickets\nCtrl + Shift + X → Cria um novo ticket\nCtrl + F → Pesquisa tickets por descrição"
+  }
+}
