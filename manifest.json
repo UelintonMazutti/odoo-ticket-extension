@@ -1,9 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Acesso rápido a tickets Odoo",
-  "version": "1.0",
+  "version": "2.0",
   "description": "Atalhos para facilitar a vida com o Odoo",
-  "permissions": ["scripting", "activeTab"],
+  "permissions": [
+    "scripting",
+    "activeTab"
+  ],
   "host_permissions": [
     "https://suporte.sag.com.br/*",
     "https://helpdesk.sag.com.br/*"
@@ -22,8 +25,12 @@
         "https://suporte.sag.com.br/*",
         "https://helpdesk.sag.com.br/*"
       ],
-      "js": ["content.js"],
-      "css": ["style.css"]
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "style.css"
+      ]
     }
   ],
   "action": {

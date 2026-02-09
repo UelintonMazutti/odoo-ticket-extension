@@ -36,8 +36,6 @@ Prioridade: Urgente
 - **Ctrl + Shift + X**:  
   Abre a criação de um novo ticket (não foi usado o Ctrl + Shift + N porque já um atalho nativo dos navegadores)
 
-- **Ctrl + F**:  
-  Pesquisa os tickets por descrição, para honra e glória de quem sofre com isso
 
 ## Funciona para os links abaixo
 
