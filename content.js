@@ -64,15 +64,8 @@ document.addEventListener("keydown", function (e) {
   ) {
     e.preventDefault();
 
-    const { input, resultsList } = createModal("Digite o ID do ticket...", async (term, inp, list) => {
+    const { input, resultsList } = createModal("Digite o ID ou Referência do ticket...", async (term, inp, list) => {
       list.innerHTML = '<li class="odoo-ticket-result-item">Buscando...</li>';
-
-      // Ensure term is a number for ID search
-      const ticketId = parseInt(term);
-      if (isNaN(ticketId)) {
-        list.innerHTML = '<li class="odoo-ticket-result-item">Por favor, digite um número válido.</li>';
-        return;
-      }
 
       const csrfToken = getCsrfToken();
       if (!csrfToken) {
@@ -80,8 +73,17 @@ document.addEventListener("keydown", function (e) {
         return;
       }
 
-      // Domain: search by ID
-      const domain = [["id", "=", ticketId]];
+      // Determine if term is numeric
+      const ticketId = parseInt(term);
+      let domain;
+
+      if (!isNaN(ticketId)) {
+        // If numeric, search by ID OR ticket_ref (if ref happens to be numeric)
+        domain = ["|", ["id", "=", ticketId], ["ticket_ref", "ilike", term]];
+      } else {
+        // If strictly string, search by ticket_ref
+        domain = [["ticket_ref", "ilike", term]];
+      }
 
       try {
         const response = await fetch(`${location.origin}/web/dataset/call_kw/helpdesk.ticket/search_read`, {
@@ -97,7 +99,7 @@ document.addEventListener("keydown", function (e) {
               kwargs: {
                 domain: domain,
                 fields: ["id", "name", "ticket_ref", "partner_id", "stage_id", "user_id", "create_date", "x_studio_prioridade"],
-                limit: 1 // ID is unique
+                limit: 5 // Updated limit to allow multiple matches if vague
               }
             },
             id: Math.floor(Math.random() * 1000000000)
