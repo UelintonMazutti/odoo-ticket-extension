@@ -1,69 +1,54 @@
-# Extensão para Facilitar a Busca de Tickets
+# Extensão Odoo Ticket Helper
 
-Esta extensão foi criada para agilizar e simplificar a busca e o gerenciamento de tickets no Odoo.
+Esta extensão turbina o seu uso do Odoo Helpdesk, adicionando atalhos rápidos e um **Assistente Inteligente (Chatbot)** para te ajudar a encontrar e gerenciar tickets.
 
-## Atalhos Disponíveis
+## 🤖 Assistente Odoo (Novo!)
 
-- **Ctrl + Espaço**:  
-  Busca pelo **ID do ticket (banco de dados)**.  
-  Útil quando você tem o número da URL (ex: 74986).  
-  <img src="Imagens/ctrl+espaco.png" alt="Busca por ID" width="600"/>
+Acesse o **ícone de chat** no canto inferior direito para conversar com a IA.
 
-- **Ctrl + Alt + Espaço**:  
-  Mesma função do Ctrl + Espaço, compatível com Opera.
+**O que ele pode fazer:**
+*   **Contar Tickets:** "Quantos tickets do cliente X estão em aberto?"
+*   **Buscar Tickets:** "Me mostre os tickets da Sigla Y que estão em 'Análise'."
+*   **Meus Tickets:** "Quais são meus tickets em 'Desenvolver'?"
+*   **Resumo:** "Resuma o ticket #12345."
 
-- **Ctrl + Shift + Espaço**:  
-  Busca pelo número do ticket que está no link da página atual.  
-  <img src="Imagens/ctrl+shift+espaco.png" alt="Busca pelo link" width="600"/>
+> **Configuração:** Para usar o Chatbot, você precisa configurar sua chave de API do Google Gemini. Clique no ícone da extensão > Opções (ou engrenagem).
 
-<div style="page-break-after: always;"></div>
+---
 
-- **Ctrl + Shift + K**:  
-  Busca tickets por **Cliente, Solicitante ou Sigla**.  
-  *Nota: Exclui tickets nos estágios "Disponível Para Suporte", "Notificado", "Encerrado", "Cancelado/Recusado".*
+## ⌨️ Atalhos de Teclado
 
-- **Ctrl + Shift + F**:  
-  Busca tickets por **Assunto ou Descrição**.
+Simplifique sua navegação com estes atalhos:
 
-- **Ctrl + Shift + C**:  
-  Copia as informações do ticket formatadas (HTML e Texto).
-  
-```
-Ticket: Validação de Sped Contribuições (#105649)
-Link: https://suporte.sag.com.br/odoo/all-tickets/73673
-Solicitantes: Novicarnes, Cristiane
-Cliente: Novicarnes, Cristiane
-Estágio: Encerrado
-Criado em: 20/05/2025 13:40:00
-Atribuído a: Luiz Felipe Coelho
-Prioridade: Urgente
-```
+| Atalho | Função |
+| :--- | :--- |
+| **Ctrl + Espaço** | **Busca Rápida de Ticket**: Abre uma janela para digitar o ID do ticket e ir direto para ele. |
+| **Ctrl + Shift + K** | **Busca por Cliente**: Pesquisa tickets por Nome do Cliente, Solicitante ou Sigla (exclui tickets fechados). |
+| **Ctrl + Shift + F** | **Busca Avançada**: Pesquisa por Assunto ou Descrição do ticket. |
+| **Ctrl + Shift + M** | **Meus Tickets**: Abre a lista de tickets atribuídos a você. |
+| **Ctrl + Shift + C** | **Copiar Info**: Copia um resumo formatado do ticket aberto para a área de transferência. |
+| **Ctrl + Shift + X** | **Novo Ticket**: Abre a tela de criação de um novo ticket. |
+| **Ctrl + Shift + Espaço** | **Ir para Ticket do Link**: Se você tem um link copiado, tenta abrir o ticket correspondente. |
 
-- **Ctrl + Shift + M**:  
-  Abre os meus tickets.
+---
 
-- **Ctrl + Shift + X**:  
-  Abre a criação de um novo ticket.
+## 🛠️ Instalação
 
+1.  Baixe/Clone este repositório.
+2.  No Chrome/Edge/Brave, vá para `chrome://extensions`.
+3.  Ative o **Modo do Desenvolvedor** (canto superior direito).
+4.  Clique em **Carregar sem compactação** (ou "Load unpacked").
+5.  Selecione a pasta do projeto.
 
-- **Ctrl + Shift + F**:  
-  Busca avançada: Pesquisa no título, descrição, rotina e documentação interna/externa (usando API do Odoo).
+## ⚙️ Configuração (Chatbot)
 
-- **Ctrl + Shift + K**:  
-  Busca por Cliente: Pesquisa por Nome do Cliente, Solicitante ou Sigla.  
-  > *Nota: Exclui automaticamente tickets nos estágios: Notificado, Encerrado, Cancelado/Recusado, Disponível Para Suporte.*
+1.  Clique com o botão direito no ícone da extensão na barra de ferramentas.
+2.  Selecione **Opções**.
+3.  Insira sua **Google Gemini API Key**.
+    *   *Se não tiver uma, crie gratuitamente no [Google AI Studio](https://aistudio.google.com/).*
+4.  Escolha o modelo (ex: `gemini-1.5-flash` para rapidez, `gemini-1.5-pro` para raciocínio complexo).
+5.  Clique em **Salvar**.
 
-## Funciona para os links abaixo
+---
 
-- [https://suporte.sag.com.br/odoo](https://suporte.sag.com.br/odoo)
-- [https://helpdesk.sag.com.br/odoo](https://helpdesk.sag.com.br/odoo)
-
-## Como Usar
-
-1. Copie a pasta **`odoo-ticket-extension-v2`** para sua máquina.
-2. Abra seu navegador e vá na área de Extensões.
-3. Ative o **Modo Desenvolvedor** nas Extensões.
-4. Clique em **Carregar expandida** ou opção semelhante (pode variar de acordo com o navegador).
-5. Selecione a pasta **`odoo-ticket-extension-v2`**.
-6. Reinicie o navegador e seja feliz.
-7. Apague a pasta do computador, se desejar (mas lembre-se de não apagar a origem se for desenvolver).
+**Desenvolvido para agilizar o suporte no Odoo!** 🚀
