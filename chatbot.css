@@ -266,4 +266,38 @@
   40% {
     transform: scale(1);
   }
+
+
+}
+
+/* Action Cards */
+.odoo-action-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 5px;
+  margin-top: 10px;
+}
+
+.odoo-action-card {
+  background-color: #fff;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+  flex: 1 1 calc(50% - 10px);
+  /* Two per row approx context */
+  text-align: center;
+  color: #714B67;
+  font-weight: 500;
+}
+
+.odoo-action-card:hover {
+  background-color: #f9f9f9;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  border-color: #d1d1d1;
 }

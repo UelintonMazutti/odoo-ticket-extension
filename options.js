@@ -2,10 +2,14 @@
 function save_options() {
     var apiKey = document.getElementById('apiKey').value;
     var apiModel = document.getElementById('apiModel').value || "gemini-1.5-flash";
+    var openAiApiKey = document.getElementById('openAiApiKey').value;
+    var openAiApiModel = document.getElementById('openAiApiModel').value || "gpt-4o-mini";
 
     chrome.storage.local.set({
         geminiApiKey: apiKey,
-        geminiApiModel: apiModel
+        geminiApiModel: apiModel,
+        openAiApiKey: openAiApiKey,
+        openAiApiModel: openAiApiModel
     }, function () {
         var status = document.getElementById('status');
         status.style.display = 'block';
@@ -22,10 +26,14 @@ function save_options() {
 function restore_options() {
     chrome.storage.local.get({
         geminiApiKey: '',
-        geminiApiModel: 'gemini-1.5-flash'
+        geminiApiModel: 'gemini-1.5-flash',
+        openAiApiKey: '',
+        openAiApiModel: 'gpt-4o-mini'
     }, function (items) {
         document.getElementById('apiKey').value = items.geminiApiKey;
         document.getElementById('apiModel').value = items.geminiApiModel;
+        document.getElementById('openAiApiKey').value = items.openAiApiKey;
+        document.getElementById('openAiApiModel').value = items.openAiApiModel;
     });
 }
 

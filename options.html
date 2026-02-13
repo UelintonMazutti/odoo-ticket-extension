@@ -77,8 +77,9 @@
     <h1>Configurações do Odoo Extension</h1>
 
     <div class="info">
-      Para utilizar o Chatbot Inteligente, você precisa de uma chave de API do Google Gemini.<br>
-      É gratuito e fácil de obter: <a href="https://aistudio.google.com/app/apikey" target="_blank">Obter Chave API</a>
+      Para utilizar o Chatbot Inteligente, você pode configurar uma chave de API do Google Gemini ou OpenAI.<br>
+      Obter chave Gemini: <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a><br>
+      Obter chave OpenAI: <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>
     </div>
 
     <label for="apiKey">Gemini API Key:</label>
@@ -86,6 +87,14 @@
 
     <label for="apiModel">Modelo Gemini (Ex: gemini-1.5-flash):</label>
     <input type="text" id="apiModel" placeholder="gemini-1.5-flash" value="gemini-1.5-flash">
+
+    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ddd;">
+
+    <label for="openAiApiKey">OpenAI API Key:</label>
+    <input type="text" id="openAiApiKey" placeholder="sk-..." autocomplete="off">
+
+    <label for="openAiApiModel">Modelo OpenAI (Ex: gpt-4o-mini):</label>
+    <input type="text" id="openAiApiModel" placeholder="gpt-4o-mini" value="gpt-4o-mini">
 
     <button id="checkModels" style="background-color: #5bc0de; margin-right: 10px;">Verificar Modelos
       Disponíveis</button>

@@ -70,7 +70,9 @@ async function callGeminiAPI(history) {
                         stage: { type: "STRING", description: "Nome do estágio/coluna Kanban (ex: 'Desenvolver', 'Análise')." },
                         status_scope: { type: "STRING", enum: ["open", "closed", "all"], description: "Filtro de status: 'open' (em aberto), 'closed' (finalizados), 'all' (todos). Padrão 'open'." },
                         assigned_to_me: { type: "BOOLEAN", description: "Se true, filtra apenas tickets atribuídos ao usuário atual." },
-                        offset: { type: "INTEGER", description: "Página/Deslocamento (múltiplos de 10). Padrão 0." }
+                        offset: { type: "INTEGER", description: "Página/Deslocamento (múltiplos de 10). Padrão 0." },
+                        date_period: { type: "STRING", enum: ["today", "yesterday", "this_week", "last_week", "this_month", "last_month"], description: "Filtro por período de data." },
+                        date_field: { type: "STRING", enum: ["create_date", "write_date", "close_date"], description: "Campo de data para filtrar. Padrão 'create_date'. Use 'write_date' ou 'close_date' para tickets finalizados." }
                     },
                     required: ["query"]
                 }
@@ -100,7 +102,9 @@ async function callGeminiAPI(history) {
                         query: { type: "STRING", description: "Termo de busca (Nome do cliente, Sigla, Assunto)." },
                         stage: { type: "STRING", description: "Nome do estágio (ex: 'Desenvolver')." },
                         status_scope: { type: "STRING", enum: ["open", "closed", "all"], description: "Filtro de status (padrao 'open')." },
-                        assigned_to_me: { type: "BOOLEAN", description: "Filtrar por 'meus tickets'." }
+                        assigned_to_me: { type: "BOOLEAN", description: "Filtrar por 'meus tickets'." },
+                        date_period: { type: "STRING", enum: ["today", "yesterday", "this_week", "last_week", "this_month", "last_month"], description: "Filtro por período de data." },
+                        date_field: { type: "STRING", enum: ["create_date", "write_date", "close_date"], description: "Campo de data para filtrar. Padrão 'create_date'." }
                     },
                     // Query removed from required to allow filtering only by stage/status
                     // required: ["query"] 

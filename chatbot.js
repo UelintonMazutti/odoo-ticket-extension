@@ -18,6 +18,15 @@ function initChatbot() {
       </div>
       <div class="odoo-chatbot-messages" id="odoo-chatbot-messages">
         <div class="odoo-message bot">Olá! Como posso ajudar com os tickets hoje?</div>
+        <div class="odoo-action-cards-container">
+            <div class="odoo-action-card" data-action="meus_tickets">Meus Tickets</div>
+            <div class="odoo-action-card" data-action="tickets_semana">Tickets da Semana</div>
+            <div class="odoo-action-card" data-action="tickets_cliente">Tickets por Cliente</div>
+            <div class="odoo-action-card" data-action="contagem_cliente">Qtd. por Cliente</div>
+            <div class="odoo-action-card" data-action="resumo_finalizados">Resumo Finalizados</div>
+            <div class="odoo-action-card" data-action="configuracao">Configuração</div>
+            <div class="odoo-action-card" data-action="ajuda">Ajuda</div>
+        </div>
       </div>
       <div class="odoo-chatbot-input-area">
         <input type="text" id="odoo-chatbot-input" placeholder="Digite sua pergunta..." autocomplete="off">
@@ -206,8 +215,8 @@ function initChatbot() {
     }
 
     async function executeTool(name, args) {
-        if (name === "search_tickets") return await searchTicketsOdoo(args.query, args.stage || null, args.status_scope || 'open', args.assigned_to_me || false, args.offset || 0);
-        if (name === "count_tickets") return await countTicketsOdoo(args.query, args.stage || null, args.status_scope || 'open', args.assigned_to_me || false);
+        if (name === "search_tickets") return await searchTicketsOdoo(args.query, args.stage || null, args.status_scope || 'open', args.assigned_to_me || false, args.offset || 0, args.date_period || null, args.date_field || 'create_date');
+        if (name === "count_tickets") return await countTicketsOdoo(args.query, args.stage || null, args.status_scope || 'open', args.assigned_to_me || false, args.date_period || null, args.date_field || 'create_date');
         if (name === "get_ticket_details") return await getTicketDetailsOdoo(args.ticket_id);
         if (name === "get_my_tickets") return await getMyTicketsOdoo();
         return { error: "Ferramenta desconhecida" };
@@ -231,7 +240,7 @@ function initChatbot() {
         }
     }
 
-    async function buildTicketDomain(query, stage, statusScope, assignedToMe) {
+    async function buildTicketDomain(query, stage, statusScope, assignedToMe, datePeriod) {
         let domain = [];
 
         // Base Query Logic
@@ -257,6 +266,55 @@ function initChatbot() {
             domain.push(["user_id", "=", session.uid]);
         }
 
+        // Date Period Filter
+        if (datePeriod) {
+            const now = new Date();
+            let start = new Date(now);
+            let end = new Date(now);
+
+            // Reset time to start/end of day
+            start.setHours(0, 0, 0, 0);
+            end.setHours(23, 59, 59, 999);
+
+            if (datePeriod === 'today') {
+                // Already set for today
+            } else if (datePeriod === 'yesterday') {
+                start.setDate(start.getDate() - 1);
+                end.setDate(end.getDate() - 1);
+            } else if (datePeriod === 'this_week') {
+                // Assuming week starts on Monday (1)
+                const day = start.getDay() || 7; // Sunday is 0, make it 7
+                if (day !== 1) start.setHours(-24 * (day - 1));
+                // End is implicitly today/end of week, but 'this week' usually means up to now or full week. 
+                // Let's go with 'from start of week'.
+            } else if (datePeriod === 'last_week') {
+                const day = start.getDay() || 7;
+                start.setDate(start.getDate() - day - 6);
+                end.setDate(end.getDate() - day);
+            } else if (datePeriod === 'this_month') {
+                start.setDate(1);
+            } else if (datePeriod === 'last_month') {
+                start.setMonth(start.getMonth() - 1);
+                start.setDate(1);
+                end.setDate(0); // Last day of previous month
+            }
+
+            // Odoo expects 'YYYY-MM-DD HH:mm:ss' in UTC usually, but domain filters are often client-timezone sensitive or just plain strings.
+            // Let's format as string. Important: Odoo stores in UTC. If we send local time string, it might be interpreted as UTC or Local depending on context.
+            // Safe bet: Convert to UTC string for comparison if field is datetime. 'create_date' is datetime.
+
+            const formatDate = (d) => d.toISOString().replace('T', ' ').substring(0, 19);
+
+            domain.push(["create_date", ">=", formatDate(start)]);
+            if (datePeriod !== 'this_week' && datePeriod !== 'this_month') {
+                // For current periods, we want ">= start". For specific past periods, we might want range.
+                // Actually simpler: 
+                // today: >= start AND <= end
+                // yesterday: >= start AND <= end
+                domain.push(["create_date", "<=", formatDate(end)]);
+            }
+        }
+
         // Status Scope Filter
         const CLOSED_STAGES = ["Encerrado", "Notificado", "Disponível Para Suporte", "Cancelado", "Recusado", "Cancelado/Recusado"];
 
@@ -269,9 +327,9 @@ function initChatbot() {
         return domain;
     }
 
-    async function searchTicketsOdoo(query, stage = null, statusScope = 'open', assignedToMe = false, offset = 0) {
+    async function searchTicketsOdoo(query, stage = null, statusScope = 'open', assignedToMe = false, offset = 0, datePeriod = null, dateField = 'create_date') {
         try {
-            const domain = await buildTicketDomain(query, stage, statusScope, assignedToMe);
+            const domain = await buildTicketDomain(query, stage, statusScope, assignedToMe, datePeriod, dateField);
 
             const limit = 10;
             // Fetch one extra to check if there are more
@@ -299,9 +357,9 @@ function initChatbot() {
         }
     }
 
-    async function countTicketsOdoo(query, stage = null, statusScope = 'open', assignedToMe = false) {
+    async function countTicketsOdoo(query, stage = null, statusScope = 'open', assignedToMe = false, datePeriod = null, dateField = 'create_date') {
         try {
-            const domain = await buildTicketDomain(query, stage, statusScope, assignedToMe);
+            const domain = await buildTicketDomain(query, stage, statusScope, assignedToMe, datePeriod, dateField);
             const count = await rpcCall("helpdesk.ticket", "search_count", [domain], {});
             return {
                 count: count,
@@ -425,11 +483,66 @@ function initChatbot() {
     input.addEventListener("keydown", (e) => {
         if (e.key === "Enter") handleSend();
     });
+
+    // Action Cards Logic
+    const actionCards = container.querySelectorAll(".odoo-action-card");
+    actionCards.forEach(card => {
+        card.addEventListener("click", () => {
+            const action = card.getAttribute("data-action");
+            handleActionCard(action);
+        });
+    });
+
+    function handleActionCard(action) {
+        let text = "";
+        let autoSend = true;
+
+        switch (action) {
+            case "meus_tickets":
+                text = "Quais são os meus tickets em aberto?";
+                break;
+            case "tickets_semana":
+                text = "Quantos tickets foram criados nesta semana?";
+                break;
+            case "tickets_cliente":
+                text = "Quais tickets estão abertos para o cliente [Nome do Cliente]?";
+                autoSend = false;
+                break;
+            case "contagem_cliente":
+                text = "Quantos tickets o cliente [Nome do Cliente] tem em aberto?";
+                autoSend = false;
+                break;
+            case "resumo_finalizados":
+                text = "Quantos tickets foram finalizados hoje, nesta semana e neste mês?";
+                break;
+            case "configuracao":
+                chrome.runtime.sendMessage({ action: "openOptions" });
+                return; // Don't send text
+            case "ajuda":
+                text = "O que você pode fazer?";
+                break;
+        }
+
+        if (text) {
+            input.value = text;
+            if (autoSend) {
+                handleSend();
+            } else {
+                input.focus();
+                // Select the placeholder part if possible, otherwise just focus
+                if (text.includes("[Nome do Cliente]")) {
+                    const start = text.indexOf("[");
+                    const end = text.indexOf("]") + 1;
+                    input.setSelectionRange(start, end);
+                }
+            }
+        }
+    }
 }
 
 // Inicialização Robust
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initChatbot);
 } else {
-    initChatbot();
+    initChatbot(); // Ensure it runs if already loaded
 }
