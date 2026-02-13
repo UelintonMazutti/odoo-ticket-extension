@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurações - Odoo Ticket Extension</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 40px;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #714B67;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background-color: #714B67;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #5a3b52;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-weight: bold;
+      color: green;
+      display: none;
+    }
+
+    .info {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Configurações do Odoo Extension</h1>
+
+    <div class="info">
+      Para utilizar o Chatbot Inteligente, você pode configurar uma chave de API do Google Gemini ou OpenAI.<br>
+      Obter chave Gemini: <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a><br>
+      Obter chave OpenAI: <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>
+    </div>
+
+    <label for="apiKey">Gemini API Key:</label>
+    <input type="text" id="apiKey" placeholder="Cole sua chave API aqui (ex: AIzaSy...)" autocomplete="off">
+
+    <label for="apiModel">Modelo Gemini (Ex: gemini-1.5-flash):</label>
+    <input type="text" id="apiModel" placeholder="gemini-1.5-flash" value="gemini-1.5-flash">
+
+    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ddd;">
+
+    <label for="openAiApiKey">OpenAI API Key:</label>
+    <input type="text" id="openAiApiKey" placeholder="sk-..." autocomplete="off">
+
+    <label for="openAiApiModel">Modelo OpenAI (Ex: gpt-4o-mini):</label>
+    <input type="text" id="openAiApiModel" placeholder="gpt-4o-mini" value="gpt-4o-mini">
+
+    <button id="checkModels" style="background-color: #5bc0de; margin-right: 10px;">Verificar Modelos
+      Disponíveis</button>
+    <button id="save">Salvar Configurações</button>
+
+    <div id="modelList"
+      style="margin-top: 20px; font-family: monospace; font-size: 12px; background: #eee; padding: 10px; display: none; white-space: pre-wrap;">
+    </div>
+
+    <div id="status">Opções salvas com sucesso!</div>
+  </div>
+  <script src="options.js"></script>
+</body>
+
+</html>

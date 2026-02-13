@@ -5,8 +5,13 @@
   "description": "Atalhos para facilitar a vida com o Odoo",
   "permissions": [
     "scripting",
-    "activeTab"
+    "activeTab",
+    "storage"
   ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
   "host_permissions": [
     "https://suporte.sag.com.br/*",
     "https://helpdesk.sag.com.br/*"
@@ -26,10 +31,12 @@
         "https://helpdesk.sag.com.br/*"
       ],
       "js": [
-        "content.js"
+        "content.js",
+        "chatbot.js"
       ],
       "css": [
-        "style.css"
+        "style.css",
+        "chatbot.css"
       ]
     }
   ],
